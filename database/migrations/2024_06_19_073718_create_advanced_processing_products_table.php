@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('advanced_processing_products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('advanced_processing_id')->constrained('advanced_processings')->cascadeOnDelete();
-            $table->foreignId('processed_product_id')->constrained('processed_products')->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
             $table->decimal('qty',8,3);
             $table->timestamp('date');
             $table->timestamps();

@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\BasicProcessing;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Support\Number;
 
 class BasicProcessingChart extends ChartWidget
 {
@@ -22,24 +23,19 @@ class BasicProcessingChart extends ChartWidget
     protected function getData(): array
     {
         $al = 0 ; $cu = 0 ; $iron = 0; $dust = 0;
-        foreach ($this->processing->materials as $material) {
-            switch ($material->material->name) {
-                case 'Aluminum':
+        foreach ($this->processing->basicProcessingMaterials as $material) {
+            switch ($material->product->id) {
+                case '1':
                     $al += $material->qty;      
                     break;
-                case 'Copper':
+                case '2':
                     $cu += $material->qty;      
                         
                     break;
-                case 'Iron':
+                case '3':
                     $iron += $material->qty;      
                     
-                    break;
-                case 'Dust':
-                    $dust += $material->qty;      
-
-                    break;
-                
+                    break;                
                 default:
 
                     break;
@@ -49,7 +45,7 @@ class BasicProcessingChart extends ChartWidget
             ($al*100)/$this->processing->qty,
             ($cu*100)/$this->processing->qty,
             ($iron*100)/$this->processing->qty,
-            ($dust*100)/$this->processing->qty ,
+            ($this->processing->dust*100)/$this->processing->qty ,
             ($this->processing->un_processed_quantity*100)/$this->processing->qty 
         ]; 
 
@@ -68,11 +64,11 @@ class BasicProcessingChart extends ChartWidget
                 ],
             ],
             'labels' => [
-                'Aluminium'.'('.($al*100)/$this->processing->qty.' %)',
-                'Copper'.'('.($cu*100)/$this->processing->qty.' %)',
-                'Iron'.'('.($iron*100)/$this->processing->qty.' %)',
-                'Dust' .'('.($dust*100)/$this->processing->qty.' %)',
-                'Unprocessed'.'('.($this->processing->un_processed_quantity*100)/$this->processing->qty.' %)',
+                'Aluminium'.'('.Number::percentage(($al*100)/$this->processing->qty, precision:2).')',
+                'Copper'.'('.Number::percentage(($cu*100)/$this->processing->qty, precision:2).')',
+                'Iron'.'('.Number::percentage(($iron*100)/$this->processing->qty, precision:2).')',
+                'Dust' .'('.Number::percentage(($this->processing->dust*100)/$this->processing->qty, precision:2).')',
+                'Unprocessed'.'('.Number::percentage(($this->processing->un_processed_quantity*100)/$this->processing->qty, precision:2).')',
             ],
         ];
     }

@@ -26,4 +26,9 @@ class Purchase extends Model
     {
         return $this->hasMany(PurchaseLineItem::class);
     }
+
+    public function getFirstLineItemAttribute()
+    {
+        return $this->lineItems()->first();    
+    }
 }

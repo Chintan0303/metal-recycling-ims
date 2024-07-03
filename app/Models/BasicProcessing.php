@@ -9,18 +9,27 @@ class BasicProcessing extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'scrap_product_id', 'qty', 'processed', 'start_date', 'end_date'
-    ];
+    protected $guarded = [];
 
-    public function scrapProduct()
+
+    public function scrap()
     {
-        return $this->belongsTo(ScrapProduct::class);
+        return $this->belongsTo(Scrap::class);
     }
 
-    public function materials()
+    public function purchaseLineItem()
+    {
+        return $this->belongsTo(PurchaseLineItem::class);
+    }
+
+    public function basicProcessingMaterials()
     {
         return $this->hasMany(BasicProcessingMaterial::class);
+    }
+
+    public function advancedProcessings()
+    {
+        return $this->hasMany(AdvancedProcessing::class);
     }
 
     public function getUnProcessedQuantityAttribute()

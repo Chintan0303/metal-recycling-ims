@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('basic_processing_materials', function (Blueprint $table) {
             $table->id();
             $table->foreignId('basic_processing_id')->constrained('basic_processings')->cascadeOnDelete();
-            $table->foreignId('material_id')->constrained('materials')->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->boolean('is_material')->default(false);
             $table->decimal('qty',8,3);
             $table->timestamp('date');
             $table->timestamps();

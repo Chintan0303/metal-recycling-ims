@@ -5,8 +5,8 @@
                 <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
                     <li>
                         <div class="flex items-center">
-                            <a href="{{ route('basic-processings') }}" wire:navigate class="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">
-                                {{ __('Basic') }}
+                            <a href="{{ route('vendors') }}" wire:navigate class="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white">
+                                {{ __('Vendors') }}
                             </a>
                         </div>
                     </li>
@@ -16,7 +16,7 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
                             </svg>
                             <span class="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">
-                                #{{ $basicProcessing->id }}
+                                {{ $vendor->name }}
                             </span>
                             </div>
                     </li>
@@ -27,10 +27,12 @@
             </div>
         </div>
     </x-slot>
-    <div class="py-4">
-        <div class="  mx-auto sm:px-6 lg:px-8">
-            {{ $this->productionInfolist }}
-        </div>
+    <div class="py-4 mx-auto sm:px-6 lg:px-8" >
+        @livewire(\App\Livewire\VendorStatsOverview::class, ['vendor'=>$vendor])
     </div>
-    <x-filament-actions::modals />
+    <div class="py-1">
+        <div class="mx-auto sm:px-6 lg:px-8">
+            {{ $this->table }}
+        </div>
+    </div> 
 </div>

@@ -9,17 +9,15 @@ class BasicProcessingMaterial extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'basic_processing_id', 'material_id', 'qty', 'date'
-    ];
+    protected $guarded = [];
 
     public function basicProcessing()
     {
         return $this->belongsTo(BasicProcessing::class);
     }
 
-    public function material()
+    public function product()
     {
-        return $this->belongsTo(Material::class);
+        return $this->belongsTo(Product::class);
     }
 }

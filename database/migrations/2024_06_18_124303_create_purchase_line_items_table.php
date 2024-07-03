@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('purchase_line_items', function (Blueprint $table) {
             $table->id();
             $table->decimal('qty',8,3);
-            $table->foreignId('scrap_product_id')->constrained('scrap_products')->cascadeOnDelete();
+            $table->foreignId('scrap_id')->constrained('scraps')->cascadeOnDelete();
             $table->foreignId('purchase_id')->constrained('purchases')->cascadeOnDelete();
             $table->timestamps();
         });

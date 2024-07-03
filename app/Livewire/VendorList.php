@@ -110,9 +110,9 @@ class VendorList extends Component implements  HasForms, HasTable
                     ]),
                 DeleteAction::make()
             ]) 
-            // ->recordUrl(
-            //     fn (Vendor $record): string => route('vendors.view', $record),
-            // )
+            ->recordUrl(
+                fn (Vendor $record): string => route('vendors.view', $record),
+            )
             ->defaultSort('created_at', 'acs');
     }
     public function render()

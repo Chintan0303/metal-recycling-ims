@@ -1,5 +1,6 @@
 <div class="flex-none relative" >
     <aside 
+        x-data="{ show:{{ auth()->user()->role == 1}} }"
         class="dark:bg-gray-900  min-h-screen h-full transition-transform ease-in-out duration-300 delay-100 transform translate-x-0"
         :class="{'w-12 bg-slate-200': ! $store.sidebar.sidebarOpen ,
                  'w-40 bg-sidebarColor':$store.sidebar.sidebarOpen ,
@@ -7,7 +8,7 @@
     >
         <template x-if="!$store.sidebar.sidebarOpen">
             <ul class="absolute top-12 w-full">
-                <li class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('dashboard')  }}' }">
+                <li x-show="show"  class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('dashboard')  }}' }">
                     <x-tooltip class="flex relative group">
                         <a  href="{{ route('dashboard') }}"  class="block w-full" wire:navigate>
                             <x-heroicon-c-squares-2x2 class="text-black" />
@@ -17,7 +18,7 @@
                         </x-slot>
                     </x-tooltip>
                 </li>
-                <li class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('users')  }}' }">
+                <li x-show="show"  class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('users')  }}' }">
                     <x-tooltip class="flex relative group">
                         <a  href="{{ route('users') }}" class="block w-full" wire:navigate>
                             <x-heroicon-o-user-plus class="text-black"/>
@@ -27,7 +28,7 @@
                         </x-slot>
                     </x-tooltip>
                 </li>
-                <li class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('vendors*')  }}' }">
+                <li  class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('vendors*')  }}' }">
                     <x-tooltip class="flex relative group">
                         <a  href="{{ route('vendors') }}"  class="block w-full" wire:navigate>
                             <x-heroicon-o-home-modern class="text-black" />
@@ -37,7 +38,7 @@
                         </x-slot>
                     </x-tooltip>
                 </li>
-                <li class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('customers*')  }}' }">
+                <li x-show="show"  class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('customers*')  }}' }">
                     <x-tooltip class="flex relative group">
                         <a  href="{{ route('customers') }}"  class="block w-full" wire:navigate>
                             <x-heroicon-s-building-office-2  class="text-black"/>
@@ -47,19 +48,9 @@
                         </x-slot>
                     </x-tooltip>
                 </li>
-                <li class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('materials*')  }}' }">
+                <li x-show="show"  class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('products*')  }}' }">
                     <x-tooltip class="flex relative group">
-                        <a  href="{{ route('materials') }}"  class="block w-full" wire:navigate>
-                            <x-heroicon-o-wrench class="text-black" />
-                        </a>
-                        <x-slot name="content">
-                            {{ __('Materials') }}
-                        </x-slot>
-                    </x-tooltip>
-                </li>
-                <li class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('processed-products*')  }}' }">
-                    <x-tooltip class="flex relative group">
-                        <a  href="{{ route('processed-products') }}"  class="block w-full" wire:navigate>
+                        <a  href="{{ route('products') }}"  class="block w-full" wire:navigate>
                             <x-heroicon-o-cube class="text-black" />
                         </a>
                         <x-slot name="content">
@@ -77,7 +68,7 @@
                         </x-slot>
                     </x-tooltip>
                 </li>
-                <li class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('purchase*')  }}' }">
+                <li  class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('purchase*')  }}' }">
                     <x-tooltip class="flex relative group">
                         <a  href="{{ route('purchases') }}"  class="block w-full" wire:navigate>
                             <x-heroicon-o-wallet class="text-black" />
@@ -87,7 +78,7 @@
                         </x-slot>
                     </x-tooltip>
                 </li>
-                <li class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('sales*')  }}' }">
+                <li x-show="show"  class="p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('sales*')  }}' }">
                     <x-tooltip class="flex relative group">
                         <a  href="{{ route('sales') }}"  class="block w-full" wire:navigate>
                             <x-heroicon-m-briefcase class="text-black" />
@@ -103,7 +94,7 @@
                             <x-heroicon-o-queue-list class="text-black" />
                         </a>
                         <x-slot name="content">
-                            {{ __('Basic') }}
+                            {{ __('Basic Processing') }}
                         </x-slot>
                     </x-tooltip>
                 </li>
@@ -113,20 +104,20 @@
                             <x-heroicon-o-cog-6-tooth class="text-black" />
                         </a>
                         <x-slot name="content">
-                            {{ __('Advanced') }}
+                            {{ __('Aluminium Processing') }}
                         </x-slot>
                     </x-tooltip>
                 </li>
         </template>
         <template x-if="$store.sidebar.sidebarOpen">
             <ul  class="absolute top-12 w-full">
-                <li class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('dashboard')  }}' }">
+                <li x-show="show"  class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('dashboard')  }}' }">
                     <span class="mr-2"><x-heroicon-c-squares-2x2 class=" w-6 h-6"/></span>
                     <a  class="block" href="{{ route('dashboard') }}" wire:navigate>
                         {{ __('Dashboard') }}
                     </a>
                 </li>
-                <li class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('users')  }}' }">
+                <li x-show="show"  class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('users')  }}' }">
                     <span class="mr-2"><x-heroicon-o-user-plus class=" w-6 h-6" /></span>
                     <a  class="block" href="{{ route('users') }}" wire:navigate>
                         {{ __('Users') }}
@@ -138,25 +129,19 @@
                         {{ __('Vendors') }}
                     </a>
                 </li>
-                <li class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('customers*')  }}' }">
+                <li x-show="show"  class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('customers*')  }}' }">
                     <span class="mr-2"><x-heroicon-s-building-office-2 class=" w-6 h-6"/></span>
                     <a  class="block" href="{{ route('customers') }}" wire:navigate>
                         {{ __('Customers') }}
                     </a>
                 </li>
-                <li class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('materials*')  }}' }">
-                    <span class="mr-2"><x-heroicon-o-wrench class=" w-6 h-6"/></span>
-                    <a  class="block" href="{{ route('materials') }}" wire:navigate>
-                        {{ __('Materials') }}
-                    </a>
-                </li>
-                <li class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('processed-products*')  }}' }">
+                <li x-show="show"  class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('products*')  }}' }">
                     <span class="mr-2"><x-heroicon-o-cube class=" w-6 h-6"/></span>
-                    <a  class="block" href="{{ route('processed-products') }}" wire:navigate>
+                    <a  class="block" href="{{ route('products') }}" wire:navigate>
                         {{ __('Products') }}
                     </a>
                 </li>
-                <li class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('scrap-products*')  }}' }">
+                <li  class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('scrap-products*')  }}' }">
                     <span class="mr-2"><x-heroicon-o-tag class=" w-6 h-6"/></span>
                     <a  class="block" href="{{ route('scrap-products') }}" wire:navigate>
                         {{ __('Scrap') }}
@@ -168,7 +153,7 @@
                         {{ __('Purchase') }}
                     </a>
                 </li>
-                <li class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('sales*')  }}' }">
+                <li x-show="show"  class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('sales*')  }}' }">
                     <span class="mr-2"><x-heroicon-m-briefcase class=" w-6 h-6"/></span>
                     <a  class="block" href="{{ route('sales') }}" wire:navigate>
                         {{ __('Sales') }}
@@ -177,13 +162,13 @@
                 <li class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('basic-processing*')  }}' }">
                     <span class="mr-2"><x-heroicon-o-queue-list class=" w-6 h-6"/></span>
                     <a  class="block" href="{{ route('basic-processings') }}" wire:navigate>
-                        {{ __('Basic') }}
+                        {{ __('Basic Processing') }}
                     </a>
                 </li>
                 <li class="flex p-3 text-justify text-white font-medium hover:bg-blue-50 hover:text-black rounded" :class="{ 'bg-teal-600' : '{{ request()->routeIs('advanced-processing*')  }}' }">
                     <span class="mr-2"><x-heroicon-o-cog-6-tooth class=" w-6 h-6"/></span>
                     <a  class="block" href="{{ route('advanced-processings') }}" wire:navigate>
-                        {{ __('Advanced') }}
+                        {{ __('Aluminium Processing') }}
                     </a>
                 </li>
             </ul>

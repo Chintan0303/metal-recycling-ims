@@ -2,14 +2,16 @@
 
 namespace App\Livewire;
 
-use App\Models\AdvancedProcessing;
-use App\Models\BasicProcessing;
-use App\Models\Scrap;
-use App\Models\Purchase;
-use App\Models\Vendor;
+use App\Models\Customer;
+use App\Models\Product;
+use App\Models\Sale;
 use Carbon\Carbon;
+use Closure;
 use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\Action;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -18,10 +20,12 @@ use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
-use Filament\Forms\Components\Textarea;;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\FontWeight;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\Indicator;
 use Filament\Tables\Table;
@@ -29,10 +33,11 @@ use Icetalker\FilamentTableRepeater\Forms\Components\TableRepeater;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Attributes\Layout;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 #[Layout('layouts.app')]
-class PurchaseList extends Component implements  HasForms, HasTable
+class SalesList extends Component implements  HasForms, HasTable
 {
     use InteractsWithTable;
     use InteractsWithForms;
@@ -40,9 +45,9 @@ class PurchaseList extends Component implements  HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->heading('Purchase')
+            ->heading('Sales')
             ->striped()
-            ->query(Purchase::query())
+            ->query(Sale::query())
             ->headerActions([
                 CreateAction::make()
                 ->form([
@@ -51,15 +56,15 @@ class PurchaseList extends Component implements  HasForms, HasTable
                             DatePicker::make('date')
                                 ->default(now())
                                 ->required(),
-                            Select::make('vendor_id')
-                                ->label('Vendor')
+                            Select::make('customer_id')
+                                ->label('Customer')
                                 ->required()
-                                ->relationship('vendor', 'name')
+                                ->relationship('customer', 'name')
                                 ->createOptionForm([
                                     Grid::make(2)
                                     ->schema([
                                         TextInput::make('name')
-                                            ->unique(Vendor::class)
+                                            ->unique(Customer::class)
                                             ->required()
                                             ->maxLength(30),
                                         TextInput::make('contact_person')
@@ -77,11 +82,10 @@ class PurchaseList extends Component implements  HasForms, HasTable
                                         ->schema([
                                             Textarea::make('address')
                                             ->maxLength(255),
-                                        ]),
+                                        ]),               
                                 ])
-                                ->options(Vendor::all()->pluck('name','id'))
-                                ->searchable()
-                                ->native(false),
+                                ->options(Customer::all()->pluck('name', 'id'))
+                                ->searchable()->native(true),
                             TextInput::make('ref')
                                 ->label('Reference')
                                 ->autocomplete(false),
@@ -90,30 +94,36 @@ class PurchaseList extends Component implements  HasForms, HasTable
                         ->label('Products')
                         ->relationship('lineItems')
                         ->schema([
-                            Select::make('scrap_id')
+                            Select::make('product_id')
                                 ->label('Product')
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->options(Scrap::all()->pluck('name','id'))
+                                ->options(Product::pluck('name','id'))
                                 ->native(false)
+                                ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                 ->required(),
                             TextInput::make('qty')
                                 ->numeric()
-                                ->suffix('Kg')
+                                ->suffix(' Kg')
+                                ->rules([
+                                    fn (Get $get): Closure => function (string $attribute, $value, Closure $fail) use($get) {
+                                        $product = Product::find($get('product_id'));
+                                        if ($value > $product->stock) {
+                                            $fail('The product available stock is  '.$product->stock);
+                                        }
+                                    },                                       
+                                ])
                                 ->autocomplete(false)
                                 ->required(),
                         ])->saveRelationshipsUsing(function (Model $record, $state){
                             foreach ($state as $relation) {
-                                $scrap = Scrap::find($relation['scrap_id']);
-                                $scrap->update(['stock'=>$scrap->stock + $relation['qty']]);
+                                $product = Product::find($relation['product_id']);
+                                $product->update(['stock'=>$product->stock - $relation['qty']]);
                             }
                             $record->lineItems()->createMany($state);
-                        })                   
-                        ->defaultItems(1)
-                        ->addActionLabel('Add more products')
-                        ->addable(false)
-                        ->columns(2),
+                        })                    
+                        ->defaultItems(1)->addActionLabel('Add more products')->minItems(1)->columns(2),
                 ])->slideOver(),  
             ])
             ->columns([
@@ -124,7 +134,7 @@ class PurchaseList extends Component implements  HasForms, HasTable
                     ->weight(FontWeight::Black)
                     ->date('d-m-Y')
                     ->sortable(),
-                TextColumn::make('vendor.name')
+                TextColumn::make('customer.name')
                     ->weight(FontWeight::Bold)
                     ->color(Color::Blue)
                     ->searchable()
@@ -132,15 +142,14 @@ class PurchaseList extends Component implements  HasForms, HasTable
                 TextColumn::make('ref')
                     ->label('#Reference')
                     ->placeholder('--'),
-                TextColumn::make('firstLineItem.scrap.name')
-                    ->label('Scrap')
+                TextColumn::make('lineItems.product.name')
+                    ->label('Products Sold')
                     ->listWithLineBreaks()
-                    ->bulleted(),
-                TextColumn::make('firstLineItem.qty')
-                    ->label('Quantity')
-                    ->suffix(' Kg')
-                    ->numeric()
+                    ->bulleted()
+                    ->limitList(3)
+                    ->expandableLimitedList()
                     ->searchable(),
+            
             ])
             ->filters([
                 Filter::make('date')
@@ -175,55 +184,13 @@ class PurchaseList extends Component implements  HasForms, HasTable
                     return $indicators;
                 })
             ])
-            ->actions([
-                Action::make('Start Basic Process')
-                ->button()
-                ->visible(fn($record)=>$record->firstLineItem->scrap->is_base && $record->firstLineItem->basicProcessings->count() == 0)
-                ->action(function($record){
-                    $basic = BasicProcessing::create([
-                        'scrap_id'=>$record->firstLineItem->scrap->id,
-                        'qty'=>$record->firstLineItem->qty,
-                        'purchase_line_item_id'=>$record->firstLineItem->id,
-                        'start_date'=>now()
-                    ]);
-                    $this->redirectRoute('basic-processings.view',['id'=>$basic->id]);
-                }),
-                Action::make('Basic Process Finished')
-                ->label(function($record){
-                    return $record->firstLineItem->basicProcessings->first()->end_date == null ? 'Basic Processing Started' : 'Basic Process Finished';
-                })
-                ->button()
-                ->visible(fn($record)=>$record->firstLineItem->scrap->is_base && $record->firstLineItem->basicProcessings->count() > 0)
-                ->url(fn($record)=>route('basic-processings.view',['id'=>$record->firstLineItem->basicProcessings->first()->id])),
-                Action::make('Start Aluminium Process')
-                ->color('warning')
-                ->button()
-                ->visible(fn($record)=>!$record->firstLineItem->scrap->is_base && $record->firstLineItem->advancedProcessings->count() == 0)
-                ->action(function($record){
-                    $adv = AdvancedProcessing::create([
-                        'scrap_id'=>$record->firstLineItem->scrap->id,
-                        'qty'=>$record->firstLineItem->qty,
-                        'purchase_line_item_id'=>$record->firstLineItem->id,
-                        'start_date'=>now()
-                    ]);
-                    $this->redirectRoute('advanced-processings.view',['id'=>$adv->id]);
-                }),
-                Action::make('Aluminium Process Finished')
-                ->button()
-                ->label(function($record){
-                    return $record->firstLineItem->advancedProcessings->first()->end_date == null ? 'Aluminium Processing Started' : 'Aluminium Process Finished';
-                })
-                ->color('warning')
-                ->visible(fn($record)=>$record->firstLineItem->advancedProcessings->count() > 0)
-                ->url(fn($record)=>route('advanced-processings.view',['id'=>$record->firstLineItem->advancedProcessings->first()->id])),    
-            ])
             // ->recordUrl(
-            //     fn (Purchase $record): string => route('purchases.view', $record->id),
+            //     fn (Sale $record): string => route('sales.view', $record),
             // )
             ->defaultSort('created_at', 'desc');
     }
     public function render()
     {
-        return view('livewire.purchase-list');
+        return view('livewire.sales-list');
     }
 }

@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\AdvancedProcessing;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Support\Number;
 
 class AdvancedProcessingChart extends ChartWidget
 {
@@ -21,20 +22,15 @@ class AdvancedProcessingChart extends ChartWidget
     protected function getData(): array
     {
         $al = 0 ; $cu = 0 ; $dust = 0;
-        foreach ($this->processing->products as $product) {
-            switch ($product->processedProduct->name) {
-                case 'Aluminium Ingot':
-                    $al += $product->qty;      
+        foreach ($this->processing->advancedProcessingProducts as $product) {
+            switch ($product->product->id) {
+                case '4':
+                    $al += $product->qty;
                     break;
-                case 'Dress':
-                    $cu += $product->qty;      
+                case '5':
+                    $cu += $product->qty;
                         
                     break;
-                case 'Dust':
-                    $dust += $product->qty;      
-
-                    break;
-                
                 default:
 
                     break;
@@ -43,7 +39,7 @@ class AdvancedProcessingChart extends ChartWidget
         $this->percentage_data = [
             ($al*100)/$this->processing->qty,
             ($cu*100)/$this->processing->qty,
-            ($dust*100)/$this->processing->qty ,
+            ($this->processing->dust*100)/$this->processing->qty ,
             ($this->processing->un_processed_quantity*100)/$this->processing->qty 
         ]; 
 
@@ -61,10 +57,10 @@ class AdvancedProcessingChart extends ChartWidget
                 ],
             ],
             'labels' => [
-                'Aluminium Ingot'.'('.($al*100)/$this->processing->qty.' %)',
-                'Dress'.'('.($cu*100)/$this->processing->qty.' %)',
-                'Dust' .'('.($dust*100)/$this->processing->qty.' %)',
-                'Unprocessed'.'('.($this->processing->un_processed_quantity*100)/$this->processing->qty.' %)',
+                'Aluminium Ingot'.'('.Number::percentage(($al*100)/$this->processing->qty,precision: 2).')',
+                'Kitty'.'('.Number::percentage(($cu*100)/$this->processing->qty, precision:2).')',
+                'Dust' .'('.Number::percentage(($this->processing->dust*100)/$this->processing->qty , precision:2).')',
+                'Unprocessed'.'('.Number::percentage(($this->processing->un_processed_quantity*100)/$this->processing->qty, precision:2).')',
             ],
         ];
     }

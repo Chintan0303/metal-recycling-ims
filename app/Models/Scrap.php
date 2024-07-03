@@ -5,16 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ScrapProduct extends Model
+class Scrap extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
 
-    /**
-     * Get the line items for the scrap product.
-     */
-    public function lineItems()
+    protected function casts(): array
+    {
+        return [
+            'is_base' => 'boolean',
+        ];
+    }
+
+    public function purchaseLineItems()
     {
         return $this->hasMany(PurchaseLineItem::class);
     }

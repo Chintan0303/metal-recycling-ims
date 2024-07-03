@@ -2,13 +2,14 @@
 
 namespace App\Livewire;
 
+use App\Models\AdvancedProcessing;
 use App\Models\AdvancedProcessingProduct;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
 
 class DashboardAdvancedChart extends ChartWidget
 {
-    protected static ?string $heading = 'Advanced Processing Report';
+    protected static ?string $heading = 'Aluminium Processing Report';
     public ?string $filter = 'year';
 
     protected function getData(): array
@@ -20,23 +21,21 @@ class DashboardAdvancedChart extends ChartWidget
         $endDate = $dateRange['end']->format('Y-m-d H:i:s');
 
 
-        $alSumQty = AdvancedProcessingProduct::join('processed_products', 'advanced_processing_products.processed_product_id', '=', 'processed_products.id')
-                    ->where('processed_products.name', 'Aluminium Ingot')
+        $alSumQty = AdvancedProcessingProduct::join('products', 'advanced_processing_products.product_id', '=', 'products.id')
+                    ->where('products.id', 4)
                     ->whereBetween('advanced_processing_products.date', [$startDate, $endDate])
                     ->sum('advanced_processing_products.qty');
-        $cuSumQty = AdvancedProcessingProduct::join('processed_products', 'advanced_processing_products.processed_product_id', '=', 'processed_products.id')
-                    ->where('processed_products.name', 'Dress')
+        $cuSumQty = AdvancedProcessingProduct::join('products', 'advanced_processing_products.product_id', '=', 'products.id')
+                    ->where('products.id', 5)
                     ->whereBetween('advanced_processing_products.date', [$startDate, $endDate])
                     ->sum('advanced_processing_products.qty');
-        $dustSumQty = AdvancedProcessingProduct::join('processed_products', 'advanced_processing_products.processed_product_id', '=', 'processed_products.id')
-                    ->where('processed_products.name', 'Dust')
-                    ->whereBetween('advanced_processing_products.date', [$startDate, $endDate])
-                    ->sum('advanced_processing_products.qty');
+        $dustSumQty = AdvancedProcessing::whereBetween('start_date', [$startDate, $endDate])
+                    ->sum('dust');
         return [
            'datasets' => [
                 [
                     'label' => 'Processed',
-                    'data' => [$alSumQty,$cuSumQty,$dustSumQty],
+                    'data' => [$alSumQty,$cuSumQty, $dustSumQty],
                     'backgroundColor'=> [
                         'rgb(255, 99, 132 , 0.2)',
                         'rgb(54, 162, 235 , 0.2)',

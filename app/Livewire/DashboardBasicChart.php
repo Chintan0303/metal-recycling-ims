@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\BasicProcessing;
 use App\Models\BasicProcessingMaterial;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
@@ -20,22 +21,20 @@ class DashboardBasicChart extends ChartWidget
         $endDate = $dateRange['end']->format('Y-m-d H:i:s');
 
 
-        $alSumQty = BasicProcessingMaterial::join('materials', 'basic_processing_materials.material_id', '=', 'materials.id')
-                    ->where('materials.name', 'Aluminum')
+        $alSumQty = BasicProcessingMaterial::join('products', 'basic_processing_materials.product_id', '=', 'products.id')
+                    ->where('products.id', 1)
                     ->whereBetween('basic_processing_materials.date', [$startDate, $endDate])
                     ->sum('basic_processing_materials.qty');
-        $cuSumQty = BasicProcessingMaterial::join('materials', 'basic_processing_materials.material_id', '=', 'materials.id')
-                    ->where('materials.name', 'Copper')
+        $cuSumQty = BasicProcessingMaterial::join('products', 'basic_processing_materials.product_id', '=', 'products.id')
+                    ->where('products.id', 2)
                     ->whereBetween('basic_processing_materials.date', [$startDate, $endDate])
                     ->sum('basic_processing_materials.qty');
-        $feSumQty = BasicProcessingMaterial::join('materials', 'basic_processing_materials.material_id', '=', 'materials.id')
-                    ->where('materials.name', 'Iron')
+        $feSumQty = BasicProcessingMaterial::join('products', 'basic_processing_materials.product_id', '=', 'products.id')
+                    ->where('products.id', 2)
                     ->whereBetween('basic_processing_materials.date', [$startDate, $endDate])
                     ->sum('basic_processing_materials.qty');
-        $dustSumQty = BasicProcessingMaterial::join('materials', 'basic_processing_materials.material_id', '=', 'materials.id')
-                    ->where('materials.name', 'Dust')
-                    ->whereBetween('basic_processing_materials.date', [$startDate, $endDate])
-                    ->sum('basic_processing_materials.qty');
+        $dustSumQty = BasicProcessing::whereBetween('start_date', [$startDate, $endDate])
+                    ->sum('dust');
         return [
            'datasets' => [
                 [

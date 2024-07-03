@@ -16,8 +16,8 @@ class StatsOverview extends BaseWidget
         $advInProgress = AdvancedProcessing::whereNull('end_date')->count();
 
         return [
-            Stat::make('Basic In Progress', $basicInProgress),
-            Stat::make('Advanced In Progress', $advInProgress),
+            Stat::make('Basic Processing In Progress', $basicInProgress),
+            Stat::make('Alumimium Processing In Progress', $advInProgress),
         ];
     }
 }

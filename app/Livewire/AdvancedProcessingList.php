@@ -3,13 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\AdvancedProcessing;
-use App\Models\Material;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -27,33 +22,48 @@ class AdvancedProcessingList extends Component implements  HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->heading('Advanced Processings')
+            ->heading('Aluminium Processings')
             ->striped()
             ->query(AdvancedProcessing::query())
-            ->headerActions([
-                CreateAction::make()
-                ->form([
-                    Select::make('material_id')
-                    ->label('Material')
-                    ->searchable()
-                    ->preload()
-                    ->native(false)
-                    ->options(Material::all()->pluck('name','id'))
-                    ->required(),
-                    TextInput::make('qty')
-                    ->numeric()
-                    ->suffix('Kg')
-                    ->required(),
-                    DatePicker::make('start_date')
-                    ->native(false)
-                    ->default(today())
-                ])
-            ])
+            // ->headerActions([
+            //     CreateAction::make()
+            //     ->form([
+            //         Select::make('material_id')
+            //         ->label('Material')
+            //         ->searchable()
+            //         ->preload()
+            //         ->native(false)
+            //         ->options(Material::all()->pluck('name','id'))
+            //         ->required(),
+            //         TextInput::make('qty')
+            //         ->numeric()
+            //         ->suffix('Kg')
+            //         ->required(),
+            //         DatePicker::make('start_date')
+            //         ->native(false)
+            //         ->default(today())
+            //     ])
+            // ])
             ->columns([
                 TextColumn::make('id')
                     ->label('#')
                     ->sortable(),
-                TextColumn::make('material.name')
+                TextColumn::make('scrap.name')
+                    ->placeholder('--')
+                    ->weight(FontWeight::Black)
+                    ->sortable(),
+                TextColumn::make('product.name')
+                    ->placeholder('--')
+                    ->weight(FontWeight::Black)
+                    ->sortable(),
+                TextColumn::make('purchaseLineItem.purchase.id')
+                    ->prefix('#')
+                    ->url(fn($state)=>  route('purchases.view',['purchase'=>$state]))
+                    ->weight(FontWeight::Black)
+                    ->sortable(),
+                TextColumn::make('purchaseLineItem.purchase.date')
+                    ->label('Purchase Date')
+                    ->date('d-m-Y')
                     ->weight(FontWeight::Black)
                     ->sortable(),
                 TextColumn::make('qty'),
@@ -68,11 +78,6 @@ class AdvancedProcessingList extends Component implements  HasForms, HasTable
                  ->color(fn (string $state): string => match ($state) {                    
                     'In Progress' => 'warning',
                     'Processed' => 'success',
-                    // 'Completed Late' => 'gray',
-                    // 'Completed In Time' => 'success',
-                    // '5' => 'gray',
-                    // '6' => 'success',
-                    // '7' => 'danger',
                 }) ,
             ])
             ->actions([

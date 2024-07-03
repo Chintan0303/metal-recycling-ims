@@ -9,7 +9,7 @@ class SaleLineItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['qty', 'processed_product_id', 'material_id', 'sale_id'];
+    protected $guarded = [];
 
     /**
      * Get the sale that owns the line item.
@@ -22,16 +22,9 @@ class SaleLineItem extends Model
     /**
      * Get the processed product that the line item refers to.
      */
-    public function processedProduct()
+    public function product()
     {
-        return $this->belongsTo(ProcessedProduct::class);
+        return $this->belongsTo(Product::class);
     }
 
-    /**
-     * Get the material that the line item refers to.
-     */
-    public function material()
-    {
-        return $this->belongsTo(Material::class);
-    }
 }

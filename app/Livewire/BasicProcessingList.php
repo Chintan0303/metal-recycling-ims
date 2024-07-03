@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\BasicProcessing;
-use App\Models\ScrapProduct;
+use App\Models\Scrap;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -33,29 +33,39 @@ class BasicProcessingList extends Component implements  HasForms, HasTable
             ->striped()
             ->query(BasicProcessing::query())
             ->headerActions([
-                CreateAction::make()
-                ->form([
-                    Select::make('scrap_product_id')
-                    ->label('Scrap product')
-                    ->searchable()
-                    ->preload()
-                    ->native(false)
-                    ->options(ScrapProduct::all()->pluck('name','id'))
-                    ->required(),
-                    TextInput::make('qty')
-                    ->numeric()
-                    ->suffix('Kg')
-                    ->required(),
-                    DatePicker::make('start_date')
-                    ->native(false)
-                    ->default(today())
-                ])
+                // CreateAction::make()
+                // ->form([
+                //     Select::make('scrap_id')
+                //     ->label('Scrap product')
+                //     ->searchable()
+                //     ->preload()
+                //     ->native(false)
+                //     ->options(Scrap::all()->pluck('name','id'))
+                //     ->required(),
+                //     TextInput::make('qty')
+                //     ->numeric()
+                //     ->suffix('Kg')
+                //     ->required(),
+                //     DatePicker::make('start_date')
+                //     ->native(false)
+                //     ->default(today())
+                // ])
             ])
             ->columns([
                 TextColumn::make('id')
                     ->label('#')
                     ->sortable(),
-                TextColumn::make('scrapProduct.name')
+                TextColumn::make('scrap.name')
+                    ->weight(FontWeight::Black)
+                    ->sortable(),
+                TextColumn::make('purchaseLineItem.purchase.id')
+                    ->prefix('#')
+                    ->url(fn($state)=>  route('purchases.view',['purchase'=>$state]))
+                    ->weight(FontWeight::Black)
+                    ->sortable(),
+                TextColumn::make('purchaseLineItem.purchase.date')
+                    ->label('Purchase Date')
+                    ->date('d-m-Y')
                     ->weight(FontWeight::Black)
                     ->sortable(),
                 TextColumn::make('qty'),
@@ -70,7 +80,6 @@ class BasicProcessingList extends Component implements  HasForms, HasTable
                  ->color(fn (string $state): string => match ($state) {                    
                     'In Progress' => 'warning',
                     'Processed' => 'success',
-                    // 'Completed Late' => 'gray',
                     // 'Completed In Time' => 'success',
                     // '5' => 'gray',
                     // '6' => 'success',

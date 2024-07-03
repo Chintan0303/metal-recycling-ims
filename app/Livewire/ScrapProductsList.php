@@ -2,9 +2,10 @@
 
 namespace App\Livewire;
 
-use App\Models\ScrapProduct;
+use App\Models\Scrap;
 use Closure;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -37,23 +38,22 @@ class ScrapProductsList extends Component implements  HasForms, HasTable
                     Grid::make(2)
                     ->schema([
                         TextInput::make('name')
-                            ->unique(ScrapProduct::class)
+                            ->unique(Scrap::class)
                             ->required()
                             ->maxLength(30),
-                        TextInput::make('stock')
-                            ->numeric()
-                            ->minValue(0)
-                            ->required(),                                            
+                        Hidden::make('stock')
+                            ->default(0),                                            
                     ]),
                 ]),
             ])
-            ->query(ScrapProduct::query())
+            ->query(Scrap::query())
             ->columns([
                 TextColumn::make('name')
                 ->weight(FontWeight::Bold)
                 ->color(Color::Blue)
                 ->searchable(),
                 TextColumn::make('stock')
+                ->suffix(' Kg')
                 ->placeholder('--'),
             ])
             ->actions([
@@ -64,17 +64,17 @@ class ScrapProductsList extends Component implements  HasForms, HasTable
                         TextInput::make('name')
                         ->rules([
                                 fn (Model $record ): Closure => function (string $attribute, $value, Closure $fail) use ($record) {
-                                    if (ScrapProduct::where('name',$value)->where('id','!=', $record->id)->exists()) {
+                                    if (Scrap::where('name',$value)->where('id','!=', $record->id)->exists()) {
                                         $fail("The name is already taken.");
                                     }
                                 },
                             ])
                             ->required()
                             ->maxLength(30),
-                        TextInput::make('stock')
-                            ->numeric()
-                            ->minValue(0)
-                            ->required(),                                            
+                        // TextInput::make('stock')
+                        //     ->numeric()
+                        //     ->minValue(0)
+                        //     ->required(),                                            
                     ]),
                 ]),
             ]) 

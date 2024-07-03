@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\ProcessedProduct;
+use App\Models\Product;
 use Closure;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\TextInput;
@@ -21,7 +21,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Component;
 
 #[Layout('layouts.app')]
-class ProcessedProductsList extends Component implements  HasForms, HasTable
+class ProductsList extends Component implements  HasForms, HasTable
 {
     use InteractsWithTable;
     use InteractsWithForms;
@@ -29,31 +29,39 @@ class ProcessedProductsList extends Component implements  HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->heading('Processed Products')
+            ->heading('Products')
             ->striped()
-            ->headerActions([
-                CreateAction::make()
-                ->form([
-                    Grid::make(2)
-                    ->schema([
-                        TextInput::make('name')
-                            ->unique(ProcessedProduct::class)
-                            ->required()
-                            ->maxLength(30),
-                        TextInput::make('stock')
-                            ->numeric()
-                            ->minValue(0)
-                            ->required(),                                            
-                    ]),
-                ]),
-            ])
-            ->query(ProcessedProduct::query())
+            // ->headerActions([
+            //     CreateAction::make()
+            //     ->form([
+            //         Grid::make(2)
+            //         ->schema([
+            //             TextInput::make('name')
+            //                 ->unique(Product::class)
+            //                 ->required()
+            //                 ->maxLength(30),
+            //             TextInput::make('stock')
+            //                 ->numeric()
+            //                 ->minValue(0)
+            //                 ->required(),                                            
+            //         ]),
+            //     ]),
+            // ])
+            ->query(Product::query())
             ->columns([
                 TextColumn::make('name')
                 ->weight(FontWeight::Bold)
                 ->color(Color::Blue)
                 ->searchable(),
                 TextColumn::make('stock')
+                ->suffix(' Kg')
+                ->placeholder('--'),
+                TextColumn::make('in_process')
+                ->label('In Process')
+                ->suffix(fn($state)=>is_numeric($state) ? ' Kg' : '')
+                ->badge()
+                ->color(fn($state)=>is_numeric($state) ? 'success' : 'warning')
+                ->numeric(decimalPlaces: 3)
                 ->placeholder('--'),
             ])
             ->actions([
@@ -64,17 +72,17 @@ class ProcessedProductsList extends Component implements  HasForms, HasTable
                         TextInput::make('name')
                         ->rules([
                                 fn (Model $record ): Closure => function (string $attribute, $value, Closure $fail) use ($record) {
-                                    if (ProcessedProduct::where('name',$value)->where('id','!=', $record->id)->exists()) {
+                                    if (Product::where('name',$value)->where('id','!=', $record->id)->exists()) {
                                         $fail("The name is already taken.");
                                     }
                                 },
                             ])
                             ->required()
                             ->maxLength(30),
-                        TextInput::make('stock')
-                            ->numeric()
-                            ->minValue(0)
-                            ->required(),                                            
+                        // TextInput::make('stock')
+                        //     ->numeric()
+                        //     ->minValue(0)
+                        //     ->required(),                                            
                     ]),
                 ]),
             ]) 
@@ -84,6 +92,6 @@ class ProcessedProductsList extends Component implements  HasForms, HasTable
 
     public function render()
     {
-        return view('livewire.processed-products-list');
+        return view('livewire.products-list');
     }
 }
